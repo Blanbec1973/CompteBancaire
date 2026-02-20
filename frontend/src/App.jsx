@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { getAccountLines, searchAccountLines, createAccountLine, updateAccountLine} from './api/accountLineApi'
+import { getAccountLines, searchAccountLines, createAccountLine, updateAccountLine, getSoldePecBanque} from './api/accountLineApi'
 import AccountLineForm from './components/AccountLineForm'
 import AccountLineRow from './components/AccountLineRow'
+import SoldePecBanque from "./components/SoldePecBanque"
 
 
 export default function App() {
@@ -46,7 +47,7 @@ export default function App() {
   return (
     <div style={{ maxWidth: 900, margin: '40px auto', fontFamily: 'Arial, sans-serif' }}>
       <h1>Compte — Gestion des lignes</h1>
-
+        <SoldePecBanque />
       <div style={{ margin: '12px 0' }}>
         <input
           placeholder="Rechercher par libellé…"

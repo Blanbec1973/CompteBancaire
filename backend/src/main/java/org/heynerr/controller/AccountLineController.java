@@ -5,19 +5,24 @@ import org.heynerr.model.AccountLine;
 import org.heynerr.model.dto.AccountLineDTO;
 import org.heynerr.model.dto.AccountLineReadDTO;
 import org.heynerr.service.AccountLineService;
+import org.heynerr.service.SoldesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/accountLines")
 public class AccountLineController {
 
     private final AccountLineService service;
+    private final SoldesService soldesService;
 
-    public AccountLineController(AccountLineService service) {
+    public AccountLineController(AccountLineService service, SoldesService soldesService) {
         this.service = service;
+        this.soldesService = soldesService;
     }
 
     @PostMapping
@@ -43,6 +48,12 @@ public class AccountLineController {
     @PutMapping("/{id}")
     public AccountLine update(@PathVariable Long id, @Valid @RequestBody AccountLineDTO dto) {
         return service.updateFromDto(id, dto);
+    }
+
+    @GetMapping("/getsoldepecbanque")
+    public Map<String, BigDecimal> getSoldePecBanque() {
+        BigDecimal solde = soldesService.getSoldePecBanque();
+        return Map.of("soldePecBanque", solde);
     }
 
 }
