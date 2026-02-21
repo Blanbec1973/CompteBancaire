@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -53,7 +54,6 @@ public class AccountLineService {
                 .toList();
     }
 
-
     @Transactional(readOnly = true)
     public List<AccountLine> search(String q) {
         // On cherche : libellé contient q (case-insensitive) OU nature.code = q (exact)
@@ -78,6 +78,21 @@ public class AccountLineService {
         return accountLineRepository.save(entity);
     }
 
+    @Transactional(readOnly = true)
+    public List<AccountLineReadDTO> findAllNotPointedOrderByDateAsc() {
+        return accountLineRepository.findByPecBanqueIsNullOrderByDateAsc()
+                .stream()
+                .map(this::toReadDto)
+                .toList();
+    }
+
+    public List<AccountLineReadDTO> findAllPointedAtDate(LocalDate datePointed) {
+        return accountLineRepository.findByPecBanqueOrderByIdDesc(datePointed)
+                .stream()
+                .map(this::toReadDto)
+                .toList();
+    }
+
     private AccountLineReadDTO toReadDto(AccountLine a) {
         return new AccountLineReadDTO(
                 a.getId(),
@@ -92,4 +107,5 @@ public class AccountLineService {
                 a.getUpdatedAt()
         );
     }
+
 }

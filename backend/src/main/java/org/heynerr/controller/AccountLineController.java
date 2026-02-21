@@ -6,10 +6,12 @@ import org.heynerr.model.dto.AccountLineDTO;
 import org.heynerr.model.dto.AccountLineReadDTO;
 import org.heynerr.service.AccountLineService;
 import org.heynerr.service.SoldesService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +56,17 @@ public class AccountLineController {
     public Map<String, BigDecimal> getSoldePecBanque() {
         BigDecimal solde = soldesService.getSoldePecBanque();
         return Map.of("soldePecBanque", solde);
+    }
+
+    @GetMapping("/non-pointed")
+    public List<AccountLineReadDTO> getNonPointed() {
+        return service.findAllNotPointedOrderByDateAsc();
+    }
+
+    @GetMapping("/pointed/{datePointed}")
+    public List<AccountLineReadDTO> getPointedAtDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate datePointed) {
+        return service.findAllPointedAtDate(datePointed);
     }
 
 }
