@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
-import { getSoldePecBanque } from '../api/accountLineApi'
+import { getSoldes } from '../api/soldesApi'
 
 export default function SoldePecBanque() {
-  const [solde, setSolde] = useState(null)
+  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     async function fetchSolde() {
       try {
-        const data = await getSoldePecBanque()
-        setSolde(data.soldePecBanque)
+        const result = await getSoldes()
+        setData(result)
       } catch (err) {
         setError("Erreur lors de la récupération du solde")
       } finally {
@@ -21,12 +21,14 @@ export default function SoldePecBanque() {
     fetchSolde()
   }, [])
 
-  if (loading) return <p>Chargement du solde...</p>
-  if (error) return <p style={{color:"red"}}>{error}</p>
+  if (loading) return <p>Chargement...</p>
+  if (error) return <p>{error}</p>
 
   return (
-    <div style={{ fontSize: "1.4rem", fontWeight: "bold" }}>
-      Solde PEC Banque : {solde} €
+    <div>
+      <p>Solde PEC Banque : {data.soldePecBanque} €</p>
+      <p>Solde fin du mois : {data.soldeFinMois} €</p>
+      <p>Date du calcul : {data.dateCalcul}</p>
     </div>
   )
 }

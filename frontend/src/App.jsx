@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { getAccountLines, searchAccountLines, createAccountLine, updateAccountLine, getSoldePecBanque} from './api/accountLineApi'
+import { getAccountLines, searchAccountLines, createAccountLine, updateAccountLine} from './api/accountLineApi'
+import { getSoldes } from './api/soldesApi'
 import AccountLineForm from './components/AccountLineForm'
 import AccountLineRow from './components/AccountLineRow'
 import SoldePecBanque from "./components/SoldePecBanque"

@@ -23,9 +23,3 @@ export async function updateAccountLine(id, dto) {
   const { data } = await http.put(`/accountLines/${id}`, dto)
   return data
 }
-
-//recupérer le solde pec par la Banque :
-export async function getSoldePecBanque() {
-const { data } = await http.get('/accountLines/getsoldepecbanque')
-  return data
-}
