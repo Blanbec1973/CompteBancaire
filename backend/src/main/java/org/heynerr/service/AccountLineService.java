@@ -61,7 +61,7 @@ public class AccountLineService {
     }
 
     @Transactional
-    public AccountLine updateFromDto(Long id, AccountLineDTO dto) {
+    public AccountLineReadDTO updateFromDto(Long id, AccountLineDTO dto) {
         AccountLine entity = accountLineRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "AccountLine introuvable: " + id));
 
@@ -75,7 +75,7 @@ public class AccountLineService {
         entity.setMontant(dto.getMontant());
         entity.setPecBanque(dto.getPecBanque());
 
-        return accountLineRepository.save(entity);
+        return toReadDto(accountLineRepository.save(entity));
     }
 
     @Transactional(readOnly = true)
@@ -93,6 +93,16 @@ public class AccountLineService {
                 .toList();
     }
 
+    @Transactional
+    public AccountLineReadDTO pointer(Long id, LocalDate datePointage) {
+        AccountLine al = accountLineRepository.findById(id)
+                .orElseThrow();
+
+        al.setPecBanque(datePointage);
+
+        return toReadDto(accountLineRepository.save(al));
+    }
+
     private AccountLineReadDTO toReadDto(AccountLine a) {
         return new AccountLineReadDTO(
                 a.getId(),
@@ -107,5 +117,6 @@ public class AccountLineService {
                 a.getUpdatedAt()
         );
     }
+
 
 }

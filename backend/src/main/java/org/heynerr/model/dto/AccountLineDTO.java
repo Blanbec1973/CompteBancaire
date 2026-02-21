@@ -18,7 +18,6 @@ public class AccountLineDTO {
     private Long numCheque;
 
     @NotNull
-    @DecimalMin(value = "0.00") // ou autoriser négatif si débit/crédit ?
     private BigDecimal montant;
 
     private LocalDate pecBanque;

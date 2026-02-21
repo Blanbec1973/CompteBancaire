@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.dto.AccountLineDTO;
 import org.heynerr.model.dto.AccountLineReadDTO;
+import org.heynerr.model.dto.PointageDTO;
 import org.heynerr.service.AccountLineService;
 import org.heynerr.service.SoldesService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,10 +49,12 @@ public class AccountLineController {
 
     // UPDATE
     @PutMapping("/{id}")
-    public AccountLine update(@PathVariable Long id, @Valid @RequestBody AccountLineDTO dto) {
+    public AccountLineReadDTO update(
+            @PathVariable Long id,
+            @RequestBody AccountLineDTO dto) {
         return service.updateFromDto(id, dto);
     }
-
+    
     @GetMapping("/getsoldepecbanque")
     public Map<String, BigDecimal> getSoldePecBanque() {
         BigDecimal solde = soldesService.getSoldePecBanque();
@@ -67,6 +70,14 @@ public class AccountLineController {
     public List<AccountLineReadDTO> getPointedAtDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate datePointed) {
         return service.findAllPointedAtDate(datePointed);
+    }
+
+    @PutMapping("/{id}/pointage")
+    public AccountLineReadDTO pointer(
+            @PathVariable Long id,
+            @RequestBody PointageDTO dto
+    ) {
+        return service.pointer(id, dto.pecBanque());
     }
 
 }
