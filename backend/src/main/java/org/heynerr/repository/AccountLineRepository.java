@@ -31,7 +31,7 @@ public interface AccountLineRepository extends JpaRepository<AccountLine, Long> 
            """)
     List<AccountLine> searchLibelleContainsOrNature(String q);
 
-    List<AccountLine> findByPecBanqueOrderByIdDesc(LocalDate pecBanque);
+    List<AccountLine> findByPecBanqueOrderByDateDesc(LocalDate pecBanque);
 
     @Query("""
     SELECT a FROM AccountLine a

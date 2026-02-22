@@ -44,7 +44,7 @@ public class AccountLineController {
 
     // SEARCH - par libellé et/ou natureCode (q)
     @GetMapping("/search")
-    public List<AccountLine> search(@RequestParam("q") String q) {
+    public List<AccountLineReadDTO> search(@RequestParam("q") String q) {
         return service.search(q);
     }
 

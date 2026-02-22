@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -57,9 +58,12 @@ public class AccountLineService {
     }
 
     @Transactional(readOnly = true)
-    public List<AccountLine> search(String q) {
+    public List<AccountLineReadDTO> search(String q) {
         // On cherche : libellé contient q (case-insensitive) OU nature.code = q (exact)
-        return accountLineRepository.searchLibelleContainsOrNature(q);
+        List<AccountLine> lines = accountLineRepository.searchLibelleContainsOrNature(q);
+        return lines.stream()
+                .map(this::toReadDto) // Utilise ton mapper
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -92,7 +96,7 @@ public class AccountLineService {
     }
 
     public List<AccountLineReadDTO> findAllPointedAtDate(LocalDate datePointed) {
-        return accountLineRepository.findByPecBanqueOrderByIdDesc(datePointed)
+        return accountLineRepository.findByPecBanqueOrderByDateDesc(datePointed)
                 .stream()
                 .map(this::toReadDto)
                 .toList();
