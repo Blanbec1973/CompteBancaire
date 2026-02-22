@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { getSoldes } from '../api/soldesApi'
+import { formatMontant, formatDate, montantColor } from "../utils/format"
 
 export default function SoldePecBanque() {
   const [data, setData] = useState(null)
@@ -25,10 +26,19 @@ export default function SoldePecBanque() {
   if (error) return <p>{error}</p>
 
   return (
-    <div>
-      <p>Solde PEC Banque : {data.soldePecBanque} €</p>
-      <p>Solde fin du mois : {data.soldeFinMois} €</p>
-      <p>Date du calcul : {data.dateCalcul}</p>
+     <div className="card" style={{ width: "250px" }}>
+      <p>Solde PEC Banque :
+          <span className="montant-pill"
+                style={{ color: montantColor(data.soldePecBanque) }}>
+            {formatMontant(data.soldePecBanque)}
+          </span>
+      </p>
+      <p>Solde au {formatDate(data.dateCalcul)} :
+          <span className="montant-pill"
+                          style={{ color: montantColor(data.soldeFinMois) }}>
+          {formatMontant(data.soldeFinMois)}
+          </span>
+      </p>
     </div>
   )
 }

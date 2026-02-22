@@ -5,7 +5,8 @@ import {
   pointLine,
   unpointLine
 } from "../api/accountLineApi"
-import { formatMontant } from "../utils/format"
+import SoldePecBanque from "../components/SoldePecBanque"
+import { formatMontant, formatDate, montantColor } from "../utils/format"
 import { MdCheck, MdClear } from "react-icons/md"
 
 export default function Pointage() {
@@ -51,18 +52,23 @@ export default function Pointage() {
             <th>Nature</th>
             <th>Num chèque</th>
             <th>Montant</th>
-            <th></th>
+            <th>Pointer</th>
           </tr>
         </thead>
         <tbody>
           {nonPointed.map(line => (
             <tr key={line.id} style={{ borderBottom: "1px solid #ddd" }}>
-              <td>{line.date}</td>
+              <td>{formatDate(line.date)}</td>
               <td>{line.libelle}</td>
               <td>{line.natureCode}</td>
               <td>{line.numCheque}</td>
               <td style={{ textAlign: "right" }}>
-                    {formatMontant(line.montant)}
+                <span
+                  className="montant-pill"
+                  style={{ color: montantColor(line.montant) }}
+                >
+                  {formatMontant(line.montant)}
+                </span>
               </td>
               <td>
                 <button onClick={() => pointer(line)} style={{ background: "none", border: "none", cursor: "pointer" }}>
@@ -84,18 +90,23 @@ export default function Pointage() {
             <th>Nature</th>
             <th>Num chèque</th>
             <th>Montant</th>
-            <th></th>
+            <th>Dépointer</th>
           </tr>
         </thead>
         <tbody>
           {pointedToday.map(line => (
             <tr key={line.id} style={{ borderBottom: "1px solid #ddd" }}>
-              <td>{line.date}</td>
+              <td>{formatDate(line.date)}</td>
               <td>{line.libelle}</td>
               <td>{line.natureCode}</td>
               <td>{line.numCheque}</td>
               <td style={{ textAlign: "right" }}>
-                   {formatMontant(line.montant)}
+                <span
+                  className="montant-pill"
+                  style={{ color: montantColor(line.montant) }}
+                >
+                  {formatMontant(line.montant)}
+                </span>
               </td>
               <td>
                 <button onClick={() => depointer(line)} style={{ background: "none", border: "none", cursor: "pointer" }}>
