@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.dto.AccountLineDTO;
 import org.heynerr.model.dto.AccountLineReadDTO;
+import org.heynerr.model.dto.GenerationDTO;
 import org.heynerr.model.dto.PointageDTO;
 import org.heynerr.service.AccountLineService;
 import org.heynerr.service.SoldesService;
@@ -63,7 +64,7 @@ public class AccountLineController {
 
     @GetMapping("/non-pointed")
     public List<AccountLineReadDTO> getNonPointed() {
-        return service.findAllNotPointedOrderByDateAsc();
+        return service.findNonPointed();
     }
 
     @GetMapping("/pointed/{datePointed}")
@@ -78,6 +79,11 @@ public class AccountLineController {
             @RequestBody PointageDTO dto
     ) {
         return service.pointer(id, dto.pecBanque());
+    }
+
+    @PostMapping("/generateAnnual")
+    public List<AccountLineReadDTO> generateAnnual(@RequestBody GenerationDTO dto) {
+        return service.generateAnnual(dto);
     }
 
 }

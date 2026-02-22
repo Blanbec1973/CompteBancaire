@@ -4,6 +4,7 @@ import org.heynerr.model.AccountLine;
 import org.heynerr.model.Nature;
 import org.heynerr.model.dto.AccountLineDTO;
 import org.heynerr.model.dto.AccountLineReadDTO;
+import org.heynerr.model.dto.GenerationDTO;
 import org.heynerr.repository.AccountLineRepository;
 import org.heynerr.repository.NatureRepository;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -79,8 +81,11 @@ public class AccountLineService {
     }
 
     @Transactional(readOnly = true)
-    public List<AccountLineReadDTO> findAllNotPointedOrderByDateAsc() {
-        return accountLineRepository.findByPecBanqueIsNullOrderByDateAsc()
+    public List<AccountLineReadDTO> findNonPointed() {
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.plusMonths(1).withDayOfMonth(15);
+
+        return accountLineRepository.findNonPointedUntil(limit)
                 .stream()
                 .map(this::toReadDto)
                 .toList();
@@ -101,6 +106,34 @@ public class AccountLineService {
         al.setPecBanque(datePointage);
 
         return toReadDto(accountLineRepository.save(al));
+    }
+
+
+    @Transactional
+    public List<AccountLineReadDTO> generateAnnual(GenerationDTO dto) {
+
+        LocalDate date = dto.date();
+        int year = date.getYear();
+
+        List<AccountLineReadDTO> results = new ArrayList<>();
+
+        while (date.getYear() == year) {
+
+            AccountLine al = new AccountLine();
+            al.setDate(date);
+            al.setLibelle(dto.libelle());
+            al.setMontant(dto.montant());
+            al.setNature(natureRepository.getReferenceById(dto.natureCode()));
+            al.setNumCheque(null);
+            al.setPecBanque(null);
+
+            AccountLine saved = accountLineRepository.save(al);
+            results.add(toReadDto(saved));
+
+            date = date.plusMonths(1);
+        }
+
+        return results;
     }
 
     private AccountLineReadDTO toReadDto(AccountLine a) {
