@@ -1,0 +1,37 @@
+/* ========== THEME GLOBAL LIGHT ========== */
+
+body {
+  background-color: #f5f5f5; /* gris très clair */
+  color: #333;
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Titres */
+h1, h2 {
+  font-weight: 500;
+  color: #222;
+}
+
+/* Boutons génériques */
+button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f0f0f0;
+}
+
+/* Zones (cartes) */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}

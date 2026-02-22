@@ -1,0 +1,34 @@
+.table-pointage {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-pointage tr:nth-child(even) {
+  background-color: #f7f7f7; /* gris très léger */
+}
+
+.table-pointage tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.table-pointage td,
+.table-pointage th {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.table-pointage th,
+.table-pointage td {
+  border-bottom: 1px solid #ddd;   /* existant */
+  border-right: 1px solid #eee;    /* nouvelle bordure verticale */
+}
+
+.table-pointage th:last-child,
+.table-pointage td:last-child {
+  border-right: none; /* supprime la bordure sur la dernière colonne */
+}
+
+.table-pointage thead {
+  background: #fafafa;
+  border-bottom: 2px solid #ddd;
+}

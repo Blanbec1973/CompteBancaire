@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import EcrituresGenerales from "./pages/EcrituresGenerales"
 import Pointage from "./pages/Pointage"
 import GenerationAnnuel from "./pages/GenerationAnnuel"
+import "./styles/table.css"
+import "./styles/theme.css"
 
 export default function App() {
   return (
