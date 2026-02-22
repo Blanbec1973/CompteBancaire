@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { formatMontant, formatDate, montantColor } from "../utils/format"
 
 export default function AccountLineRow({ accountLine, onUpdate }) {
   const [edit, setEdit] = useState(false)
@@ -17,47 +18,38 @@ export default function AccountLineRow({ accountLine, onUpdate }) {
     setEdit(false)
   }
 
-if (!edit) {
+  // Affichage en mode lecture
+  if (!edit) {
     return (
-      <li style={{ marginBottom: 8 }}>
-        <strong>{accountLine.date} {accountLine.libelle}</strong>
-        {' — '}
-        {accountLine.natureCode}
-        {' · Chq: '}
-        {accountLine.numCheque ?? '-'}
-        {' · Montant: '}
-        {accountLine.montant ?? '-'}
-        {' '}
-        <button onClick={() => setEdit(true)}>Modifier</button>
-      </li>
-    )
+      <tr>
+        <td>{accountLine.date}</td>
+        <td>{accountLine.libelle}</td>
+        <td>{accountLine.natureCode}</td>
+        <td>{accountLine.numCheque ?? '-'}</td>
+        <td style={{ textAlign: "right" }}>
+          <span className="montant-pill" style={{ color: montantColor(accountLine.montant) }}>
+            {formatMontant(accountLine.montant)}
+          </span>
+        </td>
+        <td>
+          <button onClick={() => setEdit(true)}>Modifier</button>
+        </td>
+      </tr>
+    );
   }
 
+  // Affichage en mode édition (tu peux aussi le faire dans un <tr>)
   return (
-    <div style={{ border: '1px solid #ddd', padding: 10, marginBottom: 8 }}>
-      {!edit ? (
-        <>
-          <div><b>{accountLine.date} {accountLine.libelle}</b> — {accountLine.natureCode}</div>
-          <div style={{ fontSize: 13, color: '#555' }}>
-            {accountLine.numCheque || '-'} · {accountLine.montant || '-'}
-          </div>
-          <div style={{ marginTop: 6 }}>
-            <button onClick={() => setEdit(true)}>Modifier</button>
-          </div>
-        </>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 6 }}>
-          <input value={form.date} onChange={e => change('date', e.target.value)} />
-          <input value={form.libelle} onChange={e => change('libelle', e.target.value)} />
-          <input value={form.natureCode} onChange={e => change('nature', e.target.value)} />
-          <input value={form.numCheque || ''} onChange={e => change('numcheque', e.target.value)} />
-          <input value={form.montant || ''} onChange={e => change('montant', e.target.value)} />
-          <div style={{ gridColumn: '1 / -1', marginTop: 6 }}>
-            <button onClick={save}>Enregistrer</button>
-            <button onClick={() => setEdit(false)} style={{ marginLeft: 8 }}>Annuler</button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+    <tr>
+      <td><input value={form.date} onChange={e => change('date', e.target.value)} /></td>
+      <td><input value={form.libelle} onChange={e => change('libelle', e.target.value)} /></td>
+      <td><input value={form.natureCode} onChange={e => change('natureCode', e.target.value)} /></td>
+      <td><input value={form.numCheque ?? ''} onChange={e => change('numCheque', e.target.value)} /></td>
+      <td><input value={form.montant ?? ''} onChange={e => change('montant', e.target.value)} /></td>
+      <td>
+        <button onClick={save}>Enregistrer</button>
+        <button onClick={() => setEdit(false)} style={{ marginLeft: 8 }}>Annuler</button>
+      </td>
+    </tr>
+  );
 }

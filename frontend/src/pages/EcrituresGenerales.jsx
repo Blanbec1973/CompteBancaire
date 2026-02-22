@@ -54,9 +54,23 @@ export default function EcrituresGenerales({ triggerRefreshSolde }) {
       {loading && <p>Chargement…</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {accountLines.map(c => (
-        <AccountLineRow key={c.id} accountLine={c} onUpdate={handleUpdate} />
-      ))}
+      <table className="table-pointage">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libellé</th>
+            <th>Nature</th>
+            <th>Num chèque</th>
+            <th>Montant</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {accountLines.map(c => (
+            <AccountLineRow key={c.id} accountLine={c} onUpdate={handleUpdate} />
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
