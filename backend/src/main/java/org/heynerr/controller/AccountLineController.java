@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
+@SuppressWarnings("unused")
 @RestController
 @RequestMapping("/api/accountLines")
 public class AccountLineController {

@@ -4,6 +4,7 @@ import org.heynerr.model.dto.SoldesDTO;
 import org.heynerr.service.SoldesService;
 import org.springframework.web.bind.annotation.*;
 
+@SuppressWarnings("unused")
 @RestController
 @RequestMapping("/api/soldes")
 public class SoldesController {

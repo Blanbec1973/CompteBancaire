@@ -1,12 +1,10 @@
 package org.heynerr.repository;
 
 import org.heynerr.model.AccountLine;
-import org.heynerr.model.dto.AccountLineReadDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 public interface AccountLineRepository extends JpaRepository<AccountLine, Long> {
