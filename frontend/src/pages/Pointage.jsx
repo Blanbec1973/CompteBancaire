@@ -9,7 +9,7 @@ import SoldePecBanque from "../components/SoldePecBanque"
 import { formatMontant, formatDate, montantColor } from "../utils/format"
 import { MdCheck, MdClear } from "react-icons/md"
 
-export default function Pointage() {
+export default function Pointage({ triggerRefreshSolde }) {
 
   const [nonPointed, setNonPointed] = useState([])
   const [pointedToday, setPointedToday] = useState([])
@@ -29,6 +29,7 @@ export default function Pointage() {
 
     setNonPointed(prev => prev.filter(l => l.id !== line.id))
     setPointedToday(prev => [updated, ...prev])
+    triggerRefreshSolde(); // après modification
   }
 
   async function depointer(line) {
@@ -36,6 +37,7 @@ export default function Pointage() {
 
     setPointedToday(prev => prev.filter(l => l.id !== line.id))
     setNonPointed(prev => [updated, ...prev])
+    triggerRefreshSolde(); // après modification
   }
 
   return (

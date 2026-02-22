@@ -6,7 +6,7 @@ import AccountLineForm from '../components/AccountLineForm'
 import AccountLineRow from '../components/AccountLineRow'
 
 
-export default function EcrituresGenerales() {
+export default function EcrituresGenerales({ triggerRefreshSolde }) {
 
   const [accountLines, setAccountLines] = useState([])
   const [loading, setLoading]  = useState(true)
@@ -31,6 +31,7 @@ export default function EcrituresGenerales() {
     if (!dto.accountLine) dto.accountLine = 1
     const created = await createAccountLine(dto)
     setAccountLines((prev) => [created, ...prev])
+    triggerRefreshSolde(); // après modification
   }
 
   async function handleUpdate(id, dto) {
@@ -41,8 +42,6 @@ export default function EcrituresGenerales() {
   return (
     <div style={{ maxWidth: 900, margin: '40px auto' }}>
       <h1>Compte — Toutes les écritures</h1>
-
-      <SoldePecBanque />
 
       <input
         placeholder="Rechercher…"
