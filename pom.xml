@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>org.heyner</groupId>
     <artifactId>CompteBancaire</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <!-- Parent Spring Boot -->
     <parent>
@@ -64,5 +64,96 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <sourceDirectory>${project.basedir}/backend/src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/backend/src/main/resources
+                </directory>
+            </resource>
+        </resources>
 
+    <plugins>
+    <!-- Plugin pour builder le front React -->
+    <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.12.0</version>
+        <configuration>
+            <workingDirectory>${project.basedir}/frontend</workingDirectory>
+        </configuration>
+        <executions>
+            <execution>
+                <id>install node and npm</id>
+                <goals>
+                    <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                    <nodeVersion>v18.16.0</nodeVersion>
+                    <npmVersion>9.5.1</npmVersion>
+                </configuration>
+            </execution>
+            <execution>
+                <id>npm install</id>
+                <goals>
+                    <goal>npm</goal>
+                </goals>
+                <configuration>
+                    <arguments>install</arguments>
+                </configuration>
+            </execution>
+            <execution>
+                <id>npm run build</id>
+                <goals>
+                    <goal>npm</goal>
+                </goals>
+                <configuration>
+                    <arguments>run build</arguments>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+        <!-- Plugin pour copier le build React dans static -->
+        <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+                <execution>
+                    <id>copy-react-build</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${project.basedir}/backend/src/main/resources/static</outputDirectory>
+                        <resources>
+                            <resource>
+                                <directory>${project.basedir}/frontend/dist</directory>
+                                <includes>
+                                    <include>**/*</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>3.3.2</version>
+            <configuration>
+                <mainClass>org.heynerr.CompteBancaire</mainClass>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+    </plugins>
+    </build>
 </project>

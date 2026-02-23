@@ -39,3 +39,6 @@ build/
 /frontend/node_modules/
 /.idea/sonarlint/
 /.idea/workspace.xml
+/backend/src/main/resources/static/
+/frontend/dist/
+/frontend/node/
