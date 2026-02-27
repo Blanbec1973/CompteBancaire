@@ -86,4 +86,10 @@ public class AccountLineController {
         return service.generateAnnual(dto);
     }
 
+    @GetMapping("/listcheques")
+    public List<AccountLineReadDTO> listCheques() {
+        return service.listCheque();
+    }
+
+
 }

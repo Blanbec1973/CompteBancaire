@@ -140,6 +140,13 @@ public class AccountLineService {
         return results;
     }
 
+    public List<AccountLineReadDTO> listCheque() {
+        return accountLineRepository.findByNatureOrderByNumChequeDesc(new Nature("CHQ", "Chèque", true))
+                .stream()
+                .map(this::toReadDto)
+                .toList();
+    }
+
     private AccountLineReadDTO toReadDto(AccountLine a) {
         return new AccountLineReadDTO(
                 a.getId(),
@@ -154,6 +161,7 @@ public class AccountLineService {
                 a.getUpdatedAt()
         );
     }
+
 
 
 }

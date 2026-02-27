@@ -1,6 +1,7 @@
 package org.heynerr.repository;
 
 import org.heynerr.model.AccountLine;
+import org.heynerr.model.Nature;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -38,4 +39,9 @@ public interface AccountLineRepository extends JpaRepository<AccountLine, Long> 
     ORDER BY a.date ASC
     """)
     List<AccountLine> findNonPointedUntil(LocalDate limit);
+
+    List<AccountLine> findByNatureOrderByNumChequeDesc(Nature nature);
+
+
+
 }
