@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 @Entity
 @Immutable
 @Table(name="v_soldepecbanque")
-public class SoldePecBanque {
+@SuppressWarnings("unused")
+public class SoldePrisEnCompteBanque {
 
     @Id
     @Column(name = "soldepecbanque")

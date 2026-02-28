@@ -2,7 +2,7 @@ package org.heynerr.service;
 
 
 import org.heynerr.model.SoldeFinMois;
-import org.heynerr.model.SoldePecBanque;
+import org.heynerr.model.SoldePrisEnCompteBanque;
 import org.heynerr.repository.SoldeFinMoisCourantRepository;
 import org.heynerr.repository.SoldePecBanqueRepository;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class SoldesService {
         return repoPec.findAll()
                 .stream()
                 .findFirst()
-                .map(SoldePecBanque::getSoldePecBanque)
+                .map(SoldePrisEnCompteBanque::getSoldePecBanque)
                 .orElse(BigDecimal.ZERO);
     }
 

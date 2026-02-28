@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -63,7 +62,7 @@ public class AccountLineService {
         List<AccountLine> lines = accountLineRepository.searchLibelleContainsOrNature(q);
         return lines.stream()
                 .map(this::toReadDto) // Utilise ton mapper
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional

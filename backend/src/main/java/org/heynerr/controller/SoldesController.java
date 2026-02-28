@@ -23,17 +23,4 @@ public class SoldesController {
                 soldesService.getDateSoldeFinMois()
         );
     }
-
-
-
-//    @GetMapping("/getsoldepecbanque")
-//    public Map<String, BigDecimal> getSoldePecBanque() {
-//        BigDecimal solde = soldesService.getSoldePecBanque();
-//        return Map.of("soldePecBanque", solde);
-//    }
-//
-//    @GetMapping("/getsoldefinmoiscourant")
-//    public BigDecimal getSoldeFinMoisCourant() {
-//        return 0;
-//    }
 }
