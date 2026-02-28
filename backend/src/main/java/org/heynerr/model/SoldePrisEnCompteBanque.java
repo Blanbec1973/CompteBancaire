@@ -18,7 +18,20 @@ public class SoldePrisEnCompteBanque {
     @Column(name = "soldepecbanque")
     private BigDecimal soldePecBanque;
 
+    // ✅ Obligatoire pour JPA/Hibernate (public ou protected)
+    public SoldePrisEnCompteBanque() {
+    }
+
+    // ✅ Pratique pour tes tests/fixtures
+    public SoldePrisEnCompteBanque(BigDecimal soldePecBanque) {
+        this.soldePecBanque = soldePecBanque;
+    }
+
     public BigDecimal getSoldePecBanque() {
         return soldePecBanque;
+    }
+
+    public void setSoldePecBanque(BigDecimal soldePecBanque) {
+        this.soldePecBanque = soldePecBanque;
     }
 }
