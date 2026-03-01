@@ -69,12 +69,17 @@
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/backend/src/main/java</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/backend/src/test/java</testSourceDirectory>
         <resources>
             <resource>
-                <directory>${project.basedir}/backend/src/main/resources
-                </directory>
+                <directory>${project.basedir}/backend/src/main/resources</directory>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/backend/src/test/resources</directory>
+            </testResource>
+        </testResources>
 
     <plugins>
     <!-- Plugin pour builder le front React -->
@@ -155,30 +160,56 @@
                 </execution>
             </executions>
         </plugin>
-        <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <!-- Prends une version récente disponible chez toi ; exemple : 0.8.x -->
-            <version>0.8.12</version>
-            <executions>
-                <execution>
-                    <id>prepare-agent</id>
-                    <goals>
-                        <goal>prepare-agent</goal>
-                    </goals>
-                </execution>
+                <!-- Tests unitaires -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                </plugin>
 
-                <execution>
-                    <id>report</id>
-                    <!-- génération du rapport après les tests -->
-                    <phase>test</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                </execution>
+                <!-- Tests d’intégration -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <argLine>${jacocoArgLine}</argLine>
+                    </configuration>
+                </plugin>
 
-            </executions>
-        </plugin>
+                <!-- JaCoCo -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.12</version>
+                    <executions>
+
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <propertyName>jacocoArgLine</propertyName>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+
+                    </executions>
+                </plugin>
 
     </plugins>
     </build>
