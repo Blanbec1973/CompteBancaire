@@ -8,6 +8,8 @@ import org.heynerr.model.dto.GenerationDTO;
 import org.heynerr.model.dto.PointageDTO;
 import org.heynerr.service.AccountLineService;
 import org.heynerr.service.SoldesService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/accountLines")
 public class AccountLineController {
+    private static final Logger log = LoggerFactory.getLogger(AccountLineController.class);
 
     private final AccountLineService service;
     private final SoldesService soldesService;
@@ -32,20 +35,33 @@ public class AccountLineController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AccountLine create(@Valid @RequestBody AccountLineDTO dto) {
-        return service.createFromDto(dto);
+        log.info("API POST /accountLines: received dto with libelle={}, nature={}",
+                dto.getLibelle(), dto.getNatureCode());
+        try {
+            AccountLine created = service.createFromDto(dto);
+            log.info("API POST /accountLines: created successfully, id={}", created.getId());
+            return created;
+        } catch (Exception ex) {
+            log.error("API POST /accountLines: FAILED", ex);
+            throw ex;
+        }
     }
 
 
     // READ - tout
     @GetMapping
     public List<AccountLineReadDTO> findAll() {
+        log.debug("API GET /accountLines");
         return service.findAll();
     }
 
     // SEARCH - par libellé et/ou natureCode (q)
     @GetMapping("/search")
     public List<AccountLineReadDTO> search(@RequestParam("q") String q) {
-        return service.search(q);
+        log.info("API GET /accountLines/search: query='{}'", q);
+        List<AccountLineReadDTO> results = service.search(q);
+        log.info("API GET /accountLines/search: found {} results", results.size());
+        return results;
     }
 
     // UPDATE

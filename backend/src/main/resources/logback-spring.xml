@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Propriétés par profil Spring -->
+    <springProfile name="dev">
+        <property name="LOG_DIR" value="./logs"/>
+        <property name="LOG_LEVEL_ROOT" value="DEBUG"/>
+        <property name="LOG_LEVEL_APP" value="DEBUG"/>
+        <property name="LOG_LEVEL_SPRING" value="INFO"/>
+        <property name="LOG_LEVEL_HIBERNATE" value="WARN"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_DIR" value="/var/log/comptebancaire"/>
+        <property name="LOG_LEVEL_ROOT" value="INFO"/>
+        <property name="LOG_LEVEL_APP" value="INFO"/>
+        <property name="LOG_LEVEL_SPRING" value="INFO"/>
+        <property name="LOG_LEVEL_HIBERNATE" value="WARN"/>
+    </springProfile>
+
+    <!-- Default si pas de profil (local dev) -->
+    <property name="LOG_DIR" value="./logs"/>
+    <property name="LOG_LEVEL_ROOT" value="INFO"/>
+    <property name="LOG_LEVEL_APP" value="INFO"/>
+    <property name="LOG_LEVEL_SPRING" value="INFO"/>
+    <property name="LOG_LEVEL_HIBERNATE" value="WARN"/>
+
+    <!-- Pattern log : timestamp [thread] level logger - message -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <!-- Appender CONSOLE (development) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Appender FILE avec rotation (production) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+
+        <!-- Rotation : max 100MB par file, max 30 jours, total 3GB -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender ERROR FILE (separate error log for alerts) -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Loggers application -->
+    <logger name="org.heynerr" level="${LOG_LEVEL_APP}"/>
+    <logger name="org.springframework" level="${LOG_LEVEL_SPRING}"/>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor" level="WARN"/>
+    <logger name="org.hibernate" level="${LOG_LEVEL_HIBERNATE}"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+    <!-- Root logger -->
+    <root level="${LOG_LEVEL_ROOT}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+</configuration>
+
