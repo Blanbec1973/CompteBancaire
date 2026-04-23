@@ -1,5 +1,6 @@
 package org.heynerr.service;
 
+import org.heynerr.exception.EntityNotFoundException;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.Nature;
 import org.heynerr.model.dto.AccountLineDTO;
@@ -11,13 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class AccountLineService {
@@ -56,8 +54,7 @@ public class AccountLineService {
             log.info("EXIT createFromDto: created id={}, date={}", saved.getId(), saved.getDate());
             return saved;
         } catch (Exception ex) {
-            log.error("ERROR createFromDto failed: natureCode={}", dto.getNatureCode(), ex);
-            throw ex;
+            throw new IllegalStateException("ERROR createFromDto failed: natureCode=" + dto.getNatureCode(), ex);
         }
     }
 
@@ -110,16 +107,14 @@ public class AccountLineService {
         
         try {
             AccountLine entity = accountLineRepository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Update failed: accountLine not found, id={}", id);
-                        return new ResponseStatusException(NOT_FOUND, "AccountLine introuvable: " + id);
-                    });
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("AccountLine introuvable: " + id)
+                    );
 
             Nature nature = natureRepository.findById(dto.getNatureCode())
-                    .orElseThrow(() -> {
-                        log.warn("Update failed: nature not found, code={}", dto.getNatureCode());
-                        return new ResponseStatusException(NOT_FOUND, "Nature inconnue: " + dto.getNatureCode());
-                    });
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("Update failed: nature not found, code=" + dto.getNatureCode())
+                    );
 
             entity.setDate(dto.getDate());
             entity.setLibelle(dto.getLibelle());

@@ -11,8 +11,12 @@ import java.util.List;
 @RequestMapping("/api/natures")
 public class NatureController {
 
+    private final NatureRepository natureRepository;
+
     @Autowired
-    private NatureRepository natureRepository;
+    public NatureController(NatureRepository natureRepository) {
+        this.natureRepository = natureRepository;
+    }
 
     /**
      * Récupère toutes les natures disponibles
