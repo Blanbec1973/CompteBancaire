@@ -1,6 +1,8 @@
 package org.heynerr.service;
 
 import org.heynerr.exception.EntityNotFoundException;
+import org.heynerr.exception.TechnicalException;
+import org.heynerr.logging.LogSanitizer;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.Nature;
 import org.heynerr.model.dto.AccountLineDTO;
@@ -32,13 +34,16 @@ public class AccountLineService {
     @Transactional
     public AccountLine createFromDto(AccountLineDTO dto) {
         log.info("ENTRY createFromDto: date={}, libelle={}, nature={}, montant={}",
-                dto.getDate(), dto.getLibelle(), dto.getNatureCode(), dto.getMontant());
+                dto.getDate(),
+                LogSanitizer.sanitize(dto.getLibelle()),
+                LogSanitizer.sanitize(dto.getNatureCode()),
+                dto.getMontant());
         
         try {
             Nature nature = natureRepository.findById(dto.getNatureCode())
                     .orElseThrow(() -> {
                         log.warn("Nature not found: code={}", dto.getNatureCode());
-                        return new IllegalArgumentException("Nature inconnue: " + dto.getNatureCode());
+                        return new EntityNotFoundException("Unknown nature : " + dto.getNatureCode());
                     });
 
             AccountLine entity = new AccountLine(
@@ -54,7 +59,7 @@ public class AccountLineService {
             log.info("EXIT createFromDto: created id={}, date={}", saved.getId(), saved.getDate());
             return saved;
         } catch (Exception ex) {
-            throw new IllegalStateException("ERROR createFromDto failed: natureCode=" + dto.getNatureCode(), ex);
+            throw new TechnicalException("ERROR createFromDto failed: natureCode=" + dto.getNatureCode(), ex);
         }
     }
 
@@ -63,73 +68,59 @@ public class AccountLineService {
     public List<AccountLineReadDTO> findAll() {
         log.debug("ENTRY findAll");
         long startTime = System.currentTimeMillis();
-        
-        try {
-            List<AccountLineReadDTO> results = accountLineRepository.findAllWithNature()
-                    .stream()
-                    .map(this::toReadDto)
-                    .toList();
-            
-            long duration = System.currentTimeMillis() - startTime;
-            log.info("EXIT findAll: returned {} entries in {}ms", results.size(), duration);
-            
-            if (duration > 5000) {
-                log.warn("SLOW_QUERY findAll: {}ms (should be < 5s)", duration);
-            }
-            
-            return results;
-        } catch (Exception ex) {
-            long duration = System.currentTimeMillis() - startTime;
-            log.error("ERROR findAll after {}ms", duration, ex);
-            throw ex;
+
+        List<AccountLineReadDTO> results = accountLineRepository.findAllWithNature()
+                .stream()
+                .map(this::toReadDto)
+                .toList();
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("EXIT findAll: returned {} entries in {}ms", results.size(), duration);
+
+        if (duration > 5000) {
+            log.warn("SLOW_QUERY findAll: {}ms (should be < 5s)", duration);
         }
+
+        return results;
+
     }
 
     @Transactional(readOnly = true)
     public List<AccountLineReadDTO> search(String q) {
-        log.info("ENTRY search: query='{}'", q);
-        try {
-            List<AccountLine> lines = accountLineRepository.searchLibelleContainsOrNature(q);
-            List<AccountLineReadDTO> results = lines.stream()
-                    .map(this::toReadDto)
-                    .toList();
-            log.info("EXIT search: found {} results", results.size());
-            return results;
-        } catch (Exception ex) {
-            log.error("ERROR search failed: query='{}'", q, ex);
-            throw ex;
-        }
+        log.info("ENTRY search: query='{}'", LogSanitizer.sanitize(q));
+        List<AccountLine> lines = accountLineRepository.searchLibelleContainsOrNature(q);
+        List<AccountLineReadDTO> results = lines.stream()
+                .map(this::toReadDto)
+                .toList();
+        log.info("EXIT search: found {} results", results.size());
+        return results;
     }
 
     @Transactional
     public AccountLineReadDTO updateFromDto(Long id, AccountLineDTO dto) {
-        log.debug("ENTRY updateFromDto: id={}, nature={}", id, dto.getNatureCode());
-        
-        try {
-            AccountLine entity = accountLineRepository.findById(id)
-                    .orElseThrow(() ->
-                            new EntityNotFoundException("AccountLine introuvable: " + id)
-                    );
+        log.debug("ENTRY updateFromDto: id={}, nature={}", id,
+                LogSanitizer.sanitize(dto.getNatureCode()));
 
-            Nature nature = natureRepository.findById(dto.getNatureCode())
-                    .orElseThrow(() ->
-                            new EntityNotFoundException("Update failed: nature not found, code=" + dto.getNatureCode())
-                    );
+        AccountLine entity = accountLineRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("AccountLine introuvable: " + id)
+                );
 
-            entity.setDate(dto.getDate());
-            entity.setLibelle(dto.getLibelle());
-            entity.setNature(nature);
-            entity.setNumCheque(dto.getNumCheque());
-            entity.setMontant(dto.getMontant());
-            entity.setPecBanque(dto.getPecBanque());
+        Nature nature = natureRepository.findById(dto.getNatureCode())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Update failed: nature not found, code=" + dto.getNatureCode())
+                );
 
-            AccountLineReadDTO result = toReadDto(accountLineRepository.save(entity));
-            log.info("EXIT updateFromDto: id={} updated", id);
-            return result;
-        } catch (Exception ex) {
-            log.error("ERROR updateFromDto failed: id={}", id, ex);
-            throw ex;
-        }
+        entity.setDate(dto.getDate());
+        entity.setLibelle(dto.getLibelle());
+        entity.setNature(nature);
+        entity.setNumCheque(dto.getNumCheque());
+        entity.setMontant(dto.getMontant());
+        entity.setPecBanque(dto.getPecBanque());
+
+        AccountLineReadDTO result = toReadDto(accountLineRepository.save(entity));
+        log.info("EXIT updateFromDto: id={} updated", id);
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -153,59 +144,53 @@ public class AccountLineService {
     @Transactional
     public AccountLineReadDTO pointer(Long id, LocalDate datePointage) {
         log.debug("ENTRY pointer: id={}, datePointage={}", id, datePointage);
-        
-        try {
-            AccountLine al = accountLineRepository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Cannot pointer: accountLine not found, id={}", id);
-                        return new RuntimeException("AccountLine not found");
-                    });
 
-            LocalDate previousValue = al.getPecBanque();
-            al.setPecBanque(datePointage);
-            
-            AccountLineReadDTO result = toReadDto(accountLineRepository.save(al));
-            log.info("EXIT pointer: id={}, pecBanque changed from {} to {}", id, previousValue, datePointage);
-            return result;
-        } catch (Exception ex) {
-            log.error("ERROR pointer failed: id={}", id, ex);
-            throw ex;
-        }
+        AccountLine al = accountLineRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("AccountLine not found : " + id)
+                );
+
+        LocalDate previousValue = al.getPecBanque();
+        al.setPecBanque(datePointage);
+
+        AccountLineReadDTO result = toReadDto(accountLineRepository.save(al));
+        log.info("EXIT pointer: id={}, pecBanque changed from {} to {}", id, previousValue, datePointage);
+        return result;
     }
 
 
     @Transactional
     public List<AccountLineReadDTO> generateAnnual(GenerationDTO dto) {
-        log.info("ENTRY generateAnnual: startDate={}, nature={}", dto.date(), dto.natureCode());
+        log.info("ENTRY generateAnnual: startDate={}, nature={}", dto.date(),
+                LogSanitizer.sanitize(dto.natureCode()));
         
         LocalDate date = dto.date();
         int year = date.getYear();
         List<AccountLineReadDTO> results = new ArrayList<>();
         int created = 0;
+        Nature nature = natureRepository.findById(dto.natureCode())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Unknown nature : " + dto.natureCode())
+                );
 
-        try {
-            while (date.getYear() == year) {
-                AccountLine al = new AccountLine();
-                al.setDate(date);
-                al.setLibelle(dto.libelle());
-                al.setMontant(dto.montant());
-                al.setNature(natureRepository.getReferenceById(dto.natureCode()));
-                al.setNumCheque(null);
-                al.setPecBanque(null);
+        while (date.getYear() == year) {
+            AccountLine al = new AccountLine();
+            al.setDate(date);
+            al.setLibelle(dto.libelle());
+            al.setMontant(dto.montant());
+            al.setNature(nature);
+            al.setNumCheque(null);
+            al.setPecBanque(null);
 
-                AccountLine saved = accountLineRepository.save(al);
-                results.add(toReadDto(saved));
-                created++;
-                
-                log.debug("Generated entry: date={}, id={}", date, saved.getId());
-                date = date.plusMonths(1);
-            }
-            
-            log.info("EXIT generateAnnual: created {} entries for year {}", created, year);
-        } catch (Exception ex) {
-            log.error("ERROR generateAnnual failed: year={}, created so far={}", year, created, ex);
-            throw ex;
+            AccountLine saved = accountLineRepository.save(al);
+            results.add(toReadDto(saved));
+            created++;
+
+            log.debug("Generated entry: date={}, id={}", date, saved.getId());
+            date = date.plusMonths(1);
         }
+
+        log.info("EXIT generateAnnual: created {} entries for year {}", created, year);
 
         return results;
     }
@@ -231,7 +216,5 @@ public class AccountLineService {
                 a.getUpdatedAt()
         );
     }
-
-
 
 }
