@@ -1,7 +1,6 @@
 package org.heynerr.controller;
 
 import jakarta.validation.Valid;
-import org.heynerr.exception.TechnicalException;
 import org.heynerr.logging.LogSanitizer;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.dto.AccountLineDTO;
