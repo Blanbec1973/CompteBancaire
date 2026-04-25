@@ -1,6 +1,7 @@
 package org.heynerr.controller;
 
 import jakarta.validation.Valid;
+import org.heynerr.exception.TechnicalException;
 import org.heynerr.logging.LogSanitizer;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.dto.AccountLineDTO;
@@ -36,16 +37,16 @@ public class AccountLineController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AccountLine create(@Valid @RequestBody AccountLineDTO dto) {
-        log.info("API POST /accountLines: received dto with libelle={}, nature={}",
-                LogSanitizer.sanitize(dto.getLibelle()),
-                LogSanitizer.sanitize(dto.getNatureCode()));
+        if (log.isInfoEnabled())
+            log.info("API POST /accountLines: received dto with libelle={}, nature={}",
+                   LogSanitizer.sanitize(dto.getLibelle()),
+                   LogSanitizer.sanitize(dto.getNatureCode()));
         try {
             AccountLine created = service.createFromDto(dto);
             log.info("API POST /accountLines: created successfully, id={}", created.getId());
             return created;
         } catch (Exception ex) {
-            log.error("API POST /accountLines: FAILED", ex);
-            throw ex;
+            throw new TechnicalException("API POST /accountLines: FAILED", ex);
         }
     }
 
@@ -60,8 +61,9 @@ public class AccountLineController {
     // SEARCH - par libellé et/ou natureCode (q)
     @GetMapping("/search")
     public List<AccountLineReadDTO> search(@RequestParam("q") String q) {
-        log.info("API GET /accountLines/search: query='{}'",
-                LogSanitizer.sanitize(q));
+        if (log.isInfoEnabled())
+            log.info("API GET /accountLines/search: query='{}'",
+                    LogSanitizer.sanitize(q));
         List<AccountLineReadDTO> results = service.search(q);
         log.info("API GET /accountLines/search: found {} results", results.size());
         return results;

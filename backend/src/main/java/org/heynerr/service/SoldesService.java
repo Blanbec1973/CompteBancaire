@@ -1,6 +1,7 @@
 package org.heynerr.service;
 
 
+import org.heynerr.exception.TechnicalException;
 import org.heynerr.model.SoldeFinMois;
 import org.heynerr.model.SoldePrisEnCompteBanque;
 import org.heynerr.repository.SoldeFinMoisCourantRepository;
@@ -44,8 +45,7 @@ public class SoldesService {
             
             return result;
         } catch (Exception ex) {
-            log.error("ERROR getSoldePecBanque", ex);
-            throw ex;
+            throw new TechnicalException("ERROR getSoldePecBanque", ex);
         }
     }
 

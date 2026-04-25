@@ -33,11 +33,12 @@ public class AccountLineService {
 
     @Transactional
     public AccountLine createFromDto(AccountLineDTO dto) {
-        log.info("ENTRY createFromDto: date={}, libelle={}, nature={}, montant={}",
-                dto.getDate(),
-                LogSanitizer.sanitize(dto.getLibelle()),
-                LogSanitizer.sanitize(dto.getNatureCode()),
-                dto.getMontant());
+        if (log.isInfoEnabled())
+            log.info("ENTRY createFromDto: date={}, libelle={}, nature={}, montant={}",
+                    dto.getDate(),
+                    LogSanitizer.sanitize(dto.getLibelle()),
+                    LogSanitizer.sanitize(dto.getNatureCode()),
+                    dto.getMontant());
         
         try {
             Nature nature = natureRepository.findById(dto.getNatureCode())
@@ -87,7 +88,9 @@ public class AccountLineService {
 
     @Transactional(readOnly = true)
     public List<AccountLineReadDTO> search(String q) {
-        log.info("ENTRY search: query='{}'", LogSanitizer.sanitize(q));
+        if (log.isInfoEnabled())
+            log.info("ENTRY search: query='{}'", LogSanitizer.sanitize(q));
+
         List<AccountLine> lines = accountLineRepository.searchLibelleContainsOrNature(q);
         List<AccountLineReadDTO> results = lines.stream()
                 .map(this::toReadDto)
@@ -98,8 +101,9 @@ public class AccountLineService {
 
     @Transactional
     public AccountLineReadDTO updateFromDto(Long id, AccountLineDTO dto) {
-        log.debug("ENTRY updateFromDto: id={}, nature={}", id,
-                LogSanitizer.sanitize(dto.getNatureCode()));
+        if (log.isInfoEnabled())
+            log.info("ENTRY updateFromDto: id={}, nature={}", id,
+                    LogSanitizer.sanitize(dto.getNatureCode()));
 
         AccountLine entity = accountLineRepository.findById(id)
                 .orElseThrow(() ->
@@ -161,8 +165,9 @@ public class AccountLineService {
 
     @Transactional
     public List<AccountLineReadDTO> generateAnnual(GenerationDTO dto) {
-        log.info("ENTRY generateAnnual: startDate={}, nature={}", dto.date(),
-                LogSanitizer.sanitize(dto.natureCode()));
+        if (log.isInfoEnabled())
+            log.info("ENTRY generateAnnual: startDate={}, nature={}", dto.date(),
+                    LogSanitizer.sanitize(dto.natureCode()));
         
         LocalDate date = dto.date();
         int year = date.getYear();

@@ -4,8 +4,11 @@ import org.heynerr.service.SoldesService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
+import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,12 +18,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SoldesController.class)
+@Import(SoldesControllerTest.TestConfig.class)
 class SoldesControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private SoldesService soldesService;
 
     @Test
@@ -49,5 +53,13 @@ class SoldesControllerTest {
                 .andExpect(jsonPath("$.soldePecBanque").value(0))
                 .andExpect(jsonPath("$.soldeFinMois").value(0))
                 .andExpect(jsonPath("$.dateCalcul").doesNotExist()); // ou .isEmpty() selon sérialisation
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        SoldesService soldesService() {
+            return Mockito.mock(SoldesService.class);
+        }
     }
 }
