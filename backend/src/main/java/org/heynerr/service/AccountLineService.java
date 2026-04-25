@@ -1,7 +1,5 @@
 package org.heynerr.service;
 
-import org.heynerr.exception.EntityNotFoundException;
-import org.heynerr.exception.TechnicalException;
 import org.heynerr.logging.LogSanitizer;
 import org.heynerr.model.AccountLine;
 import org.heynerr.model.Nature;
@@ -14,10 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class AccountLineService {
@@ -40,28 +42,25 @@ public class AccountLineService {
                     LogSanitizer.sanitize(dto.getNatureCode()),
                     dto.getMontant());
         
-        try {
-            Nature nature = natureRepository.findById(dto.getNatureCode())
-                    .orElseThrow(() -> {
-                        log.warn("Nature not found: code={}", dto.getNatureCode());
-                        return new EntityNotFoundException("Unknown nature : " + dto.getNatureCode());
-                    });
 
-            AccountLine entity = new AccountLine(
-                    dto.getDate(),
-                    dto.getLibelle(),
-                    nature,
-                    dto.getNumCheque(),
-                    dto.getMontant(),
-                    dto.getPecBanque()
-            );
+        Nature nature = natureRepository.findById(dto.getNatureCode())
+                .orElseThrow(() -> {
+                    log.warn("Nature not found: code={}", dto.getNatureCode());
+                    return new ResponseStatusException(NOT_FOUND, "Unknown nature : " + dto.getNatureCode());
+                });
 
-            AccountLine saved = accountLineRepository.save(entity);
-            log.info("EXIT createFromDto: created id={}, date={}", saved.getId(), saved.getDate());
-            return saved;
-        } catch (Exception ex) {
-            throw new TechnicalException("ERROR createFromDto failed: natureCode=" + dto.getNatureCode(), ex);
-        }
+        AccountLine entity = new AccountLine(
+                dto.getDate(),
+                dto.getLibelle(),
+                nature,
+                dto.getNumCheque(),
+                dto.getMontant(),
+                dto.getPecBanque()
+        );
+
+        AccountLine saved = accountLineRepository.save(entity);
+        log.info("EXIT createFromDto: created id={}, date={}", saved.getId(), saved.getDate());
+        return saved;
     }
 
 
@@ -103,16 +102,16 @@ public class AccountLineService {
     public AccountLineReadDTO updateFromDto(Long id, AccountLineDTO dto) {
         if (log.isInfoEnabled())
             log.info("ENTRY updateFromDto: id={}, nature={}", id,
-                    LogSanitizer.sanitize(dto.getNatureCode()));
+                    dto.getNatureCode());
 
         AccountLine entity = accountLineRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("AccountLine introuvable: " + id)
+                        new ResponseStatusException(NOT_FOUND, "AccountLine introuvable: " + id)
                 );
 
         Nature nature = natureRepository.findById(dto.getNatureCode())
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Update failed: nature not found, code=" + dto.getNatureCode())
+                        new ResponseStatusException(NOT_FOUND, "Update failed: nature not found, code=" + dto.getNatureCode())
                 );
 
         entity.setDate(dto.getDate());
@@ -151,7 +150,7 @@ public class AccountLineService {
 
         AccountLine al = accountLineRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("AccountLine not found : " + id)
+                        new ResponseStatusException(NOT_FOUND, "AccountLine not found : " + id)
                 );
 
         LocalDate previousValue = al.getPecBanque();
@@ -167,7 +166,7 @@ public class AccountLineService {
     public List<AccountLineReadDTO> generateAnnual(GenerationDTO dto) {
         if (log.isInfoEnabled())
             log.info("ENTRY generateAnnual: startDate={}, nature={}", dto.date(),
-                    LogSanitizer.sanitize(dto.natureCode()));
+                    dto.natureCode());
         
         LocalDate date = dto.date();
         int year = date.getYear();
@@ -175,7 +174,7 @@ public class AccountLineService {
         int created = 0;
         Nature nature = natureRepository.findById(dto.natureCode())
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Unknown nature : " + dto.natureCode())
+                        new ResponseStatusException(NOT_FOUND, "Unknown nature : " + dto.natureCode())
                 );
 
         while (date.getYear() == year) {

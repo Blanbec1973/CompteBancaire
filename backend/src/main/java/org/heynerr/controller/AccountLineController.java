@@ -41,13 +41,10 @@ public class AccountLineController {
             log.info("API POST /accountLines: received dto with libelle={}, nature={}",
                    LogSanitizer.sanitize(dto.getLibelle()),
                    LogSanitizer.sanitize(dto.getNatureCode()));
-        try {
-            AccountLine created = service.createFromDto(dto);
-            log.info("API POST /accountLines: created successfully, id={}", created.getId());
-            return created;
-        } catch (Exception ex) {
-            throw new TechnicalException("API POST /accountLines: FAILED", ex);
-        }
+
+        AccountLine created = service.createFromDto(dto);
+        log.info("API POST /accountLines: created successfully, id={}", created.getId());
+        return created;
     }
 
 

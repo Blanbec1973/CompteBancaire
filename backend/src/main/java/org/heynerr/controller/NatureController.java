@@ -1,5 +1,6 @@
 package org.heynerr.controller;
 
+import org.heynerr.exception.EntityNotFoundException;
 import org.heynerr.model.Nature;
 import org.heynerr.repository.NatureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class NatureController {
     @GetMapping("/{code}")
     public Nature getNatureByCode(@PathVariable String code) {
         return natureRepository.findById(code)
-                .orElseThrow(() -> new RuntimeException("Nature non trouvée: " + code));
+                .orElseThrow(() -> new EntityNotFoundException("Nature non trouvée: " + code));
     }
 }
 
