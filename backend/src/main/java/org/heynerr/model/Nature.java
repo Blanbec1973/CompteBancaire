@@ -20,7 +20,7 @@ public class Nature {
     @Column(nullable = false)
     private boolean requiresChequeNumber; // Ex: CHQ => true
 
-    protected Nature() { /* for JPA */ }
+    public Nature() { /* for JPA */ }
 
     public Nature(String code, String label, boolean requiresChequeNumber) {
         this.code = code;
