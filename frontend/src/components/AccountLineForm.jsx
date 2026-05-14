@@ -22,7 +22,12 @@ export default function AccountLineForm({ onCreate }) {
   const [hi, setHi] = useState(-1) // index surligné
   const debounceRef = useRef(null)
   const natureRef = useRef(null)   // pour focus le champ suivant (select nature)
+  const chequeRef = useRef(null)
+  const montantRef = useRef(null)
   const [libelleFocused, setLibelleFocused] = useState(false)
+
+  const selectedNature = natures.find(n => n.code === natureCode)
+  const requiresCheque = !!selectedNature?.requiresChequeNumber
 
   // Charger les natures au montage du composant
   useEffect(() => {
@@ -203,15 +208,42 @@ function onLibelleKeyDown(e) {
           )}
         </div>
         {/* ✨ Dropdown de natures au lieu de texte libre */}
-        <select ref={natureRef} value={natureCode} onChange={e => setNatureCode(e.target.value)} required disabled={loading}>
+        <select
+          ref={natureRef}
+          value={natureCode}
+          onChange={e => setNatureCode(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Tab") {
+              e.preventDefault()
+              if (requiresCheque) {
+                chequeRef.current?.focus()
+              } else {
+                montantRef.current?.focus()
+              }
+            }
+          }}
+          required
+          disabled={loading}
+        >
           <option value="">-- Sélectionner une nature --</option>
           {natures.map(n => (
-            <option key={n.code} value={n.code}>{n.label} ({n.code})</option>
+            <option key={n.code} value={n.code}>
+              {n.label}
+            </option>
           ))}
         </select>
-        <input placeholder="Numéro chèque" value={numCheque} onChange={e => setNumCheque(e.target.value)} />
+        <input
+          ref={chequeRef}
+          placeholder="Numéro chèque"
+          value={numCheque}
+          disabled={!requiresCheque}
+          onChange={e => setNumCheque(e.target.value)}
+          style={{ opacity: requiresCheque ? 1 : 0.5 }}
+        />
+
         {/* ✨ type="number" : saisie numérique avec . comme séparateur */}
         <input
+            ref={montantRef}
             type="number"
             step="0.01"
             placeholder="Montant *"
