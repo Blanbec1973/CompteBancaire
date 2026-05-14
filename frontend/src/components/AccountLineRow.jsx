@@ -25,6 +25,17 @@ export default function AccountLineRow({ accountLine, onUpdate }) {
 
   function change(k, v) { setForm({ ...form, [k]: v }) }
 
+  function startEdit() {
+    setForm({
+      date: (accountLine.date ?? "").slice(0, 10),
+      libelle: accountLine.libelle ?? "",
+      natureCode: accountLine.natureCode ?? accountLine.nature?.code ?? "",
+      numCheque: accountLine.numCheque ?? "",
+      montant: accountLine.montant ?? "",
+    });
+    setEdit(true);
+  }
+
   async function save() {
     await onUpdate(accountLine.id, {
       date: form.date,
@@ -50,7 +61,7 @@ export default function AccountLineRow({ accountLine, onUpdate }) {
           </span>
         </td>
         <td>
-          <button onClick={() => setEdit(true)}>Modifier</button>
+          <button onClick={startEdit}>Modifier</button>
         </td>
       </tr>
     );
@@ -59,12 +70,19 @@ export default function AccountLineRow({ accountLine, onUpdate }) {
   // Affichage en mode édition
   return (
     <tr>
-      <td><input type="date" value={form.date} onChange={e => change('date', e.target.value)} /></td>
-      <td><input value={form.libelle} onChange={e => change('libelle', e.target.value)} /></td>
+      <td><input type="date" value={form?.date ?? ""} onChange={e => change('date', e.target.value)} /></td>
+      <td><input value={form?.libelle ?? ""} onChange={e => change('libelle', e.target.value)} /></td>
       <td>
-        <select value={form.natureCode} onChange={e => change('natureCode', e.target.value)} disabled={loading}>
-          {natures.map(n => (
-            <option key={n.code} value={n.code}>{n.label} ({n.code})</option>
+        <select
+          value={form?.natureCode ?? ""}
+          onChange={(e) => change("natureCode", e.target.value)}
+          disabled={loading}
+        >
+          <option value="">-- Select nature --</option>
+          {natures.map((n) => (
+            <option key={n.code} value={n.code}>
+              {n.label}
+            </option>
           ))}
         </select>
       </td>
@@ -77,3 +95,4 @@ export default function AccountLineRow({ accountLine, onUpdate }) {
     </tr>
   );
 }
+
