@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { getNatures } from '../api/naturesApi'
 
+function previousMonthIsoDate() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  return d.toISOString().slice(0, 10); // yyyy-mm-dd
+}
+
+
 export default function AccountLineForm({ onCreate }) {
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(previousMonthIsoDate());
   const [libelle, setLibelle] = useState('')
   const [natureCode, setNatureCode] = useState('')
   const [numCheque, setNumCheque] = useState('')
