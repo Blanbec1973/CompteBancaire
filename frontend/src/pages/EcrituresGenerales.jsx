@@ -29,9 +29,9 @@ export default function EcrituresGenerales({ triggerRefreshSolde }) {
 
   async function handleCreate(dto) {
     if (!dto.accountLine) dto.accountLine = 1
-    const created = await createAccountLine(dto)
-    setAccountLines((prev) => [created, ...prev])
-    triggerRefreshSolde(); // après modification
+    await createAccountLine(dto)
+    await load()               // ✅ recharge avec GET /accountLines
+    triggerRefreshSolde()
   }
 
   async function handleUpdate(id, dto) {
