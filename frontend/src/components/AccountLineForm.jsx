@@ -65,7 +65,19 @@ export default function AccountLineForm({ onCreate }) {
         </select>
         <input placeholder="Numéro chèque" value={numCheque} onChange={e => setNumCheque(e.target.value)} />
         {/* ✨ type="number" : saisie numérique avec . comme séparateur */}
-        <input type="number" step="0.01" placeholder="Montant *" value={montant} onChange={e => setMontant(e.target.value)} />
+        <input
+            type="number"
+            step="0.01"
+            placeholder="Montant *"
+            value={montant}
+            onChange={e => setMontant(e.target.value)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.currentTarget.form.requestSubmit();
+                }
+            }}
+        />
       </div>
       <button type="submit" style={{ marginTop: 10 }}>Créer</button>
     </form>
