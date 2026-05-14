@@ -6,6 +6,8 @@ import {
   unpointLine
 } from "../api/accountLineApi"
 import SoldePecBanque from "../components/SoldePecBanque"
+import AccountLineForm from "../components/AccountLineForm"
+import { createAccountLine } from "../api/accountLineApi"
 import { formatMontant, formatDate, montantColor } from "../utils/format"
 import { MdCheck, MdClear } from "react-icons/md"
 
@@ -13,6 +15,8 @@ export default function Pointage({ triggerRefreshSolde }) {
 
   const [nonPointed, setNonPointed] = useState([])
   const [pointedToday, setPointedToday] = useState([])
+
+  const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => { load() }, [])
 
@@ -45,7 +49,45 @@ export default function Pointage({ triggerRefreshSolde }) {
       <h1>Pointage des écritures</h1>
 
       <h2>À pointer</h2>
+      <button onClick={() => setShowCreate(true)}>
+        ➕ Ajouter une écriture
+      </button>
+{showCreate && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.4)",
+      zIndex: 1000,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        borderRadius: 8,
+        padding: 20,
+        width: "900px",
+        maxWidth: "95vw",
+        maxHeight: "90vh",
+        overflow: "auto",
+      }}
+    >
+      <h2>Nouvelle écriture</h2>
 
+      <AccountLineForm
+        onCreate={async (dto) => {
+          await createAccountLine(dto); // appel API
+          setShowCreate(false);          // fermeture popup
+          await load();                  // recharge du pointage
+        }}
+        onCancel={() => setShowCreate(false)}
+      />
+    </div>
+  </div>
+)}
       <table className="table-pointage">
         <thead>
           <tr style={{ background: "#eee" }}>

@@ -8,7 +8,7 @@ function previousMonthIsoDate() {
   return d.toISOString().slice(0, 10); // yyyy-mm-dd
 }
 
-export default function AccountLineForm({ onCreate }) {
+export default function AccountLineForm({ onCreate, onCancel }) {
   const [date, setDate] = useState(previousMonthIsoDate());
   const [libelle, setLibelle] = useState('')
   const [natureCode, setNatureCode] = useState('')
@@ -257,7 +257,15 @@ function onLibelleKeyDown(e) {
             }}
         />
       </div>
-      <button type="submit" style={{ marginTop: 10 }}>Créer</button>
+      <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+        <button type="submit">Créer</button>
+
+        {onCancel && (
+          <button type="button" onClick={onCancel}>
+            Annuler
+          </button>
+        )}
+      </div>
     </form>
   )
 }
