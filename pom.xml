@@ -6,7 +6,7 @@
 
     <groupId>org.heyner</groupId>
     <artifactId>CompteBancaire</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 
     <!-- Parent Spring Boot -->
     <parent>
